@@ -64,9 +64,13 @@ Click "Add Container"
 - Scroll down then click "Deploy the container"
 
 # Creating a Docker image -> container
-In general you can follow these instructions to make a Docker image: https://medium.com/codex/dockerfile-explained-dockerize-nodejs-application-411dadbc3412
+In general you can follow these instructions to make a Docker image: 
 
-Then to push this to DockerHub follow these instructions: https://medium.com/codex/push-docker-image-to-docker-hub-acc978c76ad
+https://medium.com/codex/dockerfile-explained-dockerize-nodejs-application-411dadbc3412
+
+Then to push this to DockerHub follow these instructions: 
+
+https://medium.com/codex/push-docker-image-to-docker-hub-acc978c76ad
 
 Here's how, in short:
 
