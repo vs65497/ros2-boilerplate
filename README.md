@@ -1,6 +1,6 @@
-# ros2-boilerplate
-Boilerplate for ros2 enabled platforms
-Last updated: April 1, 2023
+# Instructions for setting up Docker and ROS2 on Raspberry Pi
+Boilerplate ROS2 for Raspberry Pi
+Last Updated: April 2, 2023
 
 # Setting up Raspberry Pi
 Using Raspberry Pi Imager, select:
@@ -31,77 +31,130 @@ ssh [username]@[ip address]
 
 Usually I make a shell script for this saved as [username].sh just so I don't forget the IP address.
 
-# Install ROS2 Humble
-https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
-
-locale  # check for UTF-8
-
-sudo apt update && sudo apt install locales
-sudo locale-gen en_US en_US.UTF-8
-sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-locale  # verify settings
-
-sudo apt install software-properties-common
-sudo add-apt-repository universe
-
-sudo apt update && sudo apt install curl -y
-sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+# Setup Docker and Portainer.io
+(From: https://www.youtube.com/watch?v=O7G3oatg5DA)
 
 sudo apt update
-
 sudo apt upgrade
 
-sudo apt install ros-humble-ros-base
+curl -sSL https://get.docker.com | sh
 
-sudo apt install ros-dev-tools
+sudo docker pull portainer/portainer-ce:linux-arm
 
-At this point it may be necessary to restart the RPi.
+sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:linux-arm
 
-sudo reboot
+Then go to your browser to:
+http://[rpi's ip address]:9000
 
-sudo apt install gh
+# Add the Docker container from Zanzivyr's Dockerhub
+Create an admin login
+Login
 
-gh auth login
+Click on the "local" environment
+Click "Containers" on the left
 
-*Here, you will need to have zanzivyr give permissions to ssh connect to the repo. This repo needs to be moved to a public location.
+Click "Add Container"
 
-# Install Boilerplate
-gh repo clone zanzivyr/ros2-boilerplate
+Create a name with no spaces
+Add the Image "zanzivyr/ros2foxy:latest"
+Scroll down then click "Deploy the container"
 
-cd ~/ros2-boilerplate
+# Creating a Docker image -> container
+In general you can follow these instructions to make a Docker image: https://medium.com/codex/dockerfile-explained-dockerize-nodejs-application-411dadbc3412
 
-Source the workspace
+Then to push this to DockerHub follow these instructions: https://medium.com/codex/push-docker-image-to-docker-hub-acc978c76ad
 
-. install/setup.bash
+Here's how, in short:
 
-colcon build --symlink-install
+mkdir ecobot && cd ecobot
+touch Dockerfile
+vim Dockerfile
 
-# Running the Boilerplate
-In the current window run the following:
+Copy and paste the code from the section "Creating a Dockerfile to build ROS packages" into the Dockerfile. (I will include that code here in a section below just for completeness.) https://hub.docker.com/r/arm64v8/ros/
 
-Source the workspace.
+Now build your Docker image
 
-. install/setup.bash
+docker build -t [name]:[tag] .
+Ex: docker build -t ros2foxy:latest .
 
-Run.
+Make sure you login to Dockerhub first
 
-ros2 run cpp_pubsub talker
+docker login
 
-Open a new window then run the following:
+Then tag it. Make sure the name and the tag are the same for both volumes.
 
-cd ~/ros2-boilerplate
+docker tag [name]:[tag] [dockerhub name]/[name]:[tag]
+Ex: docker tag ros2foxy:latest zanzivyr/ros2foxy:latest
 
-. install/setup.bash
+Finally, push it to Dockerhub
 
-ros2 run cpp_pubsub listener
+docker push [dockerhub name]/[name]:[tag]
+Ex: docker push zanzivyr/ros2foxy:latest
 
-# For running the Launch file
-cd ~/ros2-boilerplate
+--------------------------------
 
-. install/setup.bash
+# Creating a Dockerfile to build ROS packages
+ARG FROM_IMAGE=arm64v8/ros:foxy
+ARG OVERLAY_WS=/opt/ros/overlay_ws
 
-ros2 launch cpp_pubsub startup.py
+## multi-stage for caching
+FROM $FROM_IMAGE AS cacher
+
+## clone overlay source
+ARG OVERLAY_WS
+WORKDIR $OVERLAY_WS/src
+RUN echo "\
+repositories: \n\
+## change these file names to your git repo. you don't need version. also, remember these names for later.
+  ros2/demos: \n\
+    type: git \n\
+    url: https://github.com/ros2/demos.git \n\
+    version: ${ROS_DISTRO} \n\
+" > ../overlay.repos
+RUN vcs import ./ < ../overlay.repos
+
+## copy manifests for caching
+WORKDIR /opt
+RUN mkdir -p /tmp/opt && \
+    find ./ -name "package.xml" | \
+      xargs cp --parents -t /tmp/opt && \
+    find ./ -name "COLCON_IGNORE" | \
+      xargs cp --parents -t /tmp/opt || true
+
+## multi-stage for building
+FROM $FROM_IMAGE AS builder
+
+## install overlay dependencies
+ARG OVERLAY_WS
+WORKDIR $OVERLAY_WS
+COPY --from=cacher /tmp/$OVERLAY_WS/src ./src
+RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+    apt-get update && rosdep install -y \
+      --from-paths \
+## change these names to the structure of your repo. for example, if you wrote above "zanzivyr/directory" and in your repo the package is at "src/package", then you want to write "src/zanzivyr/directory/src/package"
+        src/ros2/demos/demo_nodes_cpp \
+        src/ros2/demos/demo_nodes_py \
+      --ignore-src \
+    && rm -rf /var/lib/apt/lists/*
+
+## build overlay source
+COPY --from=cacher $OVERLAY_WS/src ./src
+ARG OVERLAY_MIXINS="release"
+RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+    colcon build \
+      --packages-select \
+## add your package names. as with above, it should be something like "package"
+        demo_nodes_cpp \
+        demo_nodes_py \
+      --mixin $OVERLAY_MIXINS
+
+## source entrypoint setup
+ENV OVERLAY_WS $OVERLAY_WS
+RUN sed --in-place --expression \
+      '$isource "$OVERLAY_WS/install/setup.bash"' \
+      /ros_entrypoint.sh
+
+## run launch file
+## this should mirror your ros package structure
+CMD ["ros2", "launch", "demo_nodes_cpp", "talker_listener.launch.py"]
+
