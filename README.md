@@ -23,7 +23,7 @@ This didn't work every time. I just reflashed the SD card and tried again with t
 
 Take note of the IP address. I was typically not able to find the pi with a normal scan of the router network.
 
-nmap -sn 192.168.1.0/24
+`nmap -sn 192.168.1.0/24`
 
 To connect:
 
