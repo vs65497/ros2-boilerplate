@@ -35,7 +35,7 @@ Usually I make a shell script for this saved as [username].sh just so I don't fo
 (From: https://www.youtube.com/watch?v=O7G3oatg5DA)
 
 ```sudo apt update
-sudo apt upgrade
+sudo apt upgrade```
 
 curl -sSL https://get.docker.com | sh
 
