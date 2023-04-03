@@ -5,15 +5,15 @@ Last Updated: April 2, 2023
 # Setting up Raspberry Pi
 Using Raspberry Pi Imager, select:
 
-Ubuntu Server 22.04.2 LTS (64-bit) ARM x64
-Set hostname: "____.local"
-Enable SSH, Use password authentication
-Set username and password
-Configure wireless LAN
-SSID and Password: [wifi credentials]
-Wireless LAN country: US
-Set locale settings: America, us
-Play sound when finished, Eject media when finished, Enable telemetry
+- Ubuntu Server 22.04.2 LTS (64-bit) ARM x64
+- Set hostname: "____.local"
+- Enable SSH, Use password authentication
+- Set username and password
+- Configure wireless LAN
+- SSID and Password: [wifi credentials]
+- Wireless LAN country: US
+- Set locale settings: America, us
+- Play sound when finished, Eject media when finished, Enable telemetry
 
 In order to connect the RPi to the network it was necessary to connect an ethernet cable to the pi on first initialization.
 
