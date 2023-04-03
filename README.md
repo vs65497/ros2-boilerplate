@@ -57,9 +57,9 @@ Click "Containers" on the left
 
 Click "Add Container"
 
-Create a name with no spaces
-Add the Image "zanzivyr/ros2foxy:latest"
-Scroll down then click "Deploy the container"
+- Create a name with no spaces
+- Add the Image "zanzivyr/ros2foxy:latest"
+- Scroll down then click "Deploy the container"
 
 # Creating a Docker image -> container
 In general you can follow these instructions to make a Docker image: https://medium.com/codex/dockerfile-explained-dockerize-nodejs-application-411dadbc3412
