@@ -23,25 +23,25 @@ This didn't work every time. I just reflashed the SD card and tried again with t
 
 Take note of the IP address. I was typically not able to find the pi with a normal scan of the router network.
 
-nmap -sn 192.168.1.0/24
+`nmap -sn 192.168.1.0/24`
 
 To connect:
 
-ssh [username]@[ip address]
+`ssh [username]@[ip address]`
 
 Usually I make a shell script for this saved as [username].sh just so I don't forget the IP address.
 
 # Setup Docker and Portainer.io
 (From: https://www.youtube.com/watch?v=O7G3oatg5DA)
 
-sudo apt update
+```sudo apt update
 sudo apt upgrade
 
 curl -sSL https://get.docker.com | sh
 
 sudo docker pull portainer/portainer-ce:linux-arm
 
-sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:linux-arm
+sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:linux-arm```
 
 Then go to your browser to:
 http://[rpi's ip address]:9000
@@ -66,35 +66,35 @@ Then to push this to DockerHub follow these instructions: https://medium.com/cod
 
 Here's how, in short:
 
-mkdir ecobot && cd ecobot
+```mkdir ecobot && cd ecobot
 touch Dockerfile
-vim Dockerfile
+vim Dockerfile```
 
 Copy and paste the code from the section "Creating a Dockerfile to build ROS packages" into the Dockerfile. (I will include that code here in a section below just for completeness.) https://hub.docker.com/r/arm64v8/ros/
 
 Now build your Docker image
 
-docker build -t [name]:[tag] .
-Ex: docker build -t ros2foxy:latest .
+`docker build -t [name]:[tag] .`
+Ex: `docker build -t ros2foxy:latest .`
 
 Make sure you login to Dockerhub first
 
-docker login
+`docker login`
 
 Then tag it. Make sure the name and the tag are the same for both volumes.
 
-docker tag [name]:[tag] [dockerhub name]/[name]:[tag]
-Ex: docker tag ros2foxy:latest zanzivyr/ros2foxy:latest
+`docker tag [name]:[tag] [dockerhub name]/[name]:[tag]`
+Ex: `docker tag ros2foxy:latest zanzivyr/ros2foxy:latest`
 
 Finally, push it to Dockerhub
 
-docker push [dockerhub name]/[name]:[tag]
-Ex: docker push zanzivyr/ros2foxy:latest
+`docker push [dockerhub name]/[name]:[tag]`
+Ex: `docker push zanzivyr/ros2foxy:latest`
 
 --------------------------------
 
 # Creating a Dockerfile to build ROS packages
-ARG FROM_IMAGE=arm64v8/ros:foxy
+```ARG FROM_IMAGE=arm64v8/ros:foxy
 ARG OVERLAY_WS=/opt/ros/overlay_ws
 
 ## multi-stage for caching
@@ -156,5 +156,5 @@ RUN sed --in-place --expression \
 
 ## run launch file
 ## this should mirror your ros package structure
-CMD ["ros2", "launch", "demo_nodes_cpp", "talker_listener.launch.py"]
+CMD ["ros2", "launch", "demo_nodes_cpp", "talker_listener.launch.py"]```
 
