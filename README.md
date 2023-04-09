@@ -186,6 +186,7 @@ Also, here are some documents which helped me:
 - Hadabot ESP32, CLI: https://www.hadabot.com/setup-esp32-using-cli-to-work-with-ros2.html
 - Install adafruit-ampy: https://learn.adafruit.com/micropython-basics-load-files-and-run-code/install-ampy
 - Hadabot GitHub: https://github.com/hadabot/hadabot_main
+- Micro ROS documentation: https://micro.ros.org/docs/tutorials/core/first_application_linux/
 
 And I should mention that any reference to int32_publisher or w/e is in the ros2 desktop version. So if you manually install that instead of using docker then you should get that to run demos.
 
