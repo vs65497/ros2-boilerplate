@@ -180,6 +180,15 @@ This is a multistep process. You cannot do this without Ubuntu 20.04. This is wh
 3. Get Docker.
 4. Setup ESP32.
 
+Also, here are some documents which helped me:
+- AJ's documentation: https://docs.google.com/document/d/1Ph1ytrvDHn1J7ciubE9Ibcr6nY_KtMoRd5ia6QWcSuM/edit#
+- Hadabot ESP32: https://www.hadabot.com/setup-esp32-to-work-with-ros2.html
+- Hadabot ESP32, CLI: https://www.hadabot.com/setup-esp32-using-cli-to-work-with-ros2.html
+- Install adafruit-ampy: https://learn.adafruit.com/micropython-basics-load-files-and-run-code/install-ampy
+- Hadabot GitHub: https://github.com/hadabot/hadabot_main
+
+And I should mention that any reference to int32_publisher or w/e is in the ros2 desktop version. So if you manually install that instead of using docker then you should get that to run demos.
+
 # Dual Boot
 
 https://opensource.com/article/18/5/dual-boot-linux 
@@ -454,3 +463,4 @@ frame_id: fake_ping
 ```
 
 Source: https://micro.ros.org/docs/tutorials/core/first_application_rtos/freertos/
+
