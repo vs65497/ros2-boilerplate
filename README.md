@@ -429,6 +429,8 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 ros2 topic pub --once /microROS/ping std_msgs/msg/Header '{frame_id: "fake_ping"}'
 ```
 
+(I found more information on how to do this here" https://roboticsbackend.com/ros2-topic-cmd-line-tool-debug-ros2-topics-from-the-terminal/)
+
 Now, we should see this fake_ping in the ping subscriber console, along with the board’s pings:
 
 ```
